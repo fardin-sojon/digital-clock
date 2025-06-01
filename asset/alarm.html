@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Alarm Clock</title>
+<style>
+  /* Dark theme background */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 420px;
+    margin: 40px auto;
+    padding: 25px;
+    background: #121212; /* Dark background */
+    color: #e0e0e0; /* Light grey text */
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #0f9d58cc; /* subtle green glow */
+  }
+
+  h1 {
+    color: #0f9d58; /* bright green heading */
+    margin-bottom: 25px;
+  }
+
+  label {
+    display: block;
+    margin: 15px 0 8px;
+    font-weight: 600;
+    color: #a5d6a7; /* light green */
+  }
+
+  select, input[type="text"] {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #1e1e1e;
+    color: #cfcfcf;
+    font-size: 16px;
+    outline: none;
+    width: 100px;
+    margin: 0 6px;
+    box-shadow: inset 0 0 5px #0f9d58aa;
+    cursor: pointer;
+  }
+
+  input[type="text"] {
+    width: 180px;
+  }
+
+  button {
+    margin-top: 20px;
+    padding: 10px 24px;
+    background: #0f9d58;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    box-shadow: 0 0 10px #0f9d58cc;
+  }
+
+  button:hover {
+    background: #0b6e3b;
+  }
+
+  #alarmsList {
+    margin-top: 30px;
+    text-align: left;
+  }
+
+  .alarmItem {
+    background: #1f1f1f;
+    margin-bottom: 12px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 8px #0f9d58aa inset;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #a5d6a7;
+    font-weight: 600;
+  }
+
+  .alarmTime {
+    font-size: 18px;
+  }
+
+  .alarmName {
+    font-size: 16px;
+    font-style: italic;
+    color: #cfcfcf;
+    max-width: 140px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .removeBtn, .stopBtn {
+    background: #e53935; /* red */
+    border: none;
+    color: white;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-left: 12px;
+    box-shadow: 0 0 6px #e5393555;
+    transition: background 0.3s ease;
+  }
+
+  .removeBtn:hover, .stopBtn:hover {
+    background: #b71c1c;
+  }
+
+  .stopBtn {
+    background: #fbc02d; /* yellow */
+    color: #212121;
+    box-shadow: 0 0 8px #fbc02d88;
+  }
+
+  .stopBtn:hover {
+    background: #c49000;
+    color: white;
+  }
+</style>
+</head>
+<body>
+  <h1>Alarm Clock</h1>
+  
+  <label for="hour">Hour</label>
+  <select id="hour">
+    <option value="" disabled selected>HH</option>
+  </select>
+
+  <label for="minute">Minute</label>
+  <select id="minute">
+    <option value="" disabled selected>MM</option>
+  </select>
+
+  <label for="amPm">AM/PM</label>
+  <select id="amPm">
+    <option value="" disabled selected>AM/PM</option>
+    <option value="AM">AM</option>
+    <option value="PM">PM</option>
+  </select>
+
+  <input type="text" id="alarmName" placeholder="Alarm Name (optional)" maxlength="25" />
+
+  <br/>
+  <button id="setAlarmBtn">Set Alarm</button>
+
+  <div id="alarmsList"></div>
+
+<script>
+  // Populate hour and minute options
+  const hourSelect = document.getElementById('hour');
+  const minuteSelect = document.getElementById('minute');
+
+  for(let i=1; i<=12; i++){
+    let val = i < 10 ? '0' + i : i;
+    let option = document.createElement('option');
+    option.value = val;
+    option.textContent = val;
+    hourSelect.appendChild(option);
+  }
+
+  for(let i=0; i<60; i++){
+    let val = i < 10 ? '0' + i : i;
+    let option = document.createElement('option');
+    option.value = val;
+    option.textContent = val;
+    minuteSelect.appendChild(option);
+  }
+
+  const setAlarmBtn = document.getElementById('setAlarmBtn');
+  const alarmsList = document.getElementById('alarmsList');
+  let alarms = [];
+
+  function formatTime(h, m, ampm) {
+    return `${h}:${m} ${ampm}`;
+  }
+
+  function getCurrentTime12Hour() {
+    let now = new Date();
+    let hrs = now.getHours();
+    let mins = now.getMinutes();
+    let secs = now.getSeconds();
+    let ampm = hrs >= 12 ? 'PM' : 'AM';
+    hrs = hrs % 12;
+    hrs = hrs ? hrs : 12;
+    return {
+      hour: hrs < 10 ? '0'+hrs : ''+hrs,
+      minute: mins < 10 ? '0'+mins : ''+mins,
+      second: secs < 10 ? '0'+secs : ''+secs,
+      ampm: ampm
+    };
+  }
+
+  function playAlarmSound() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+    oscillator.connect(audioCtx.destination);
+    oscillator.start();
+    setTimeout(() => {
+      oscillator.stop();
+    }, 2000);
+  }
+
+  function checkAlarms() {
+    let now = getCurrentTime12Hour();
+    alarms.forEach((alarm) => {
+      if (!alarm.active) return;
+      if (
+        alarm.hour === now.hour &&
+        alarm.minute === now.minute &&
+        alarm.ampm === now.ampm &&
+        !alarm.ringing
+      ) {
+        alarm.ringing = true;
+        playAlarmSound();
+        alert(alarm.name ? alarm.name : "Alarm ringing!");
+        updateAlarmsList();
+      }
+    });
+  }
+
+  setInterval(checkAlarms, 1000);
+
+  function updateAlarmsList() {
+    alarmsList.innerHTML = '';
+    alarms.forEach((alarm, index) => {
+      const div = document.createElement('div');
+      div.className = 'alarmItem';
+      
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'alarmTime';
+      timeSpan.textContent = formatTime(alarm.hour, alarm.minute, alarm.ampm);
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'alarmName';
+      nameSpan.textContent = alarm.name || '(No Name)';
+
+      const stopBtn = document.createElement('button');
+      stopBtn.className = 'stopBtn';
+      stopBtn.textContent = alarm.ringing ? 'Stop' : '';
+      stopBtn.disabled = !alarm.ringing;
+      stopBtn.onclick = () => {
+        alarm.ringing = false;
+        updateAlarmsList();
+      };
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'removeBtn';
+      removeBtn.textContent = 'Remove';
+      removeBtn.onclick = () => {
+        alarms.splice(index, 1);
+        updateAlarmsList();
+      };
+
+      div.appendChild(timeSpan);
+      div.appendChild(nameSpan);
+      div.appendChild(stopBtn);
+      div.appendChild(removeBtn);
+
+      alarmsList.appendChild(div);
+    });
+  }
+
+  setAlarmBtn.addEventListener('click', () => {
+    const hour = hourSelect.value;
+    const minute = minuteSelect.value;
+    const ampm = document.getElementById('amPm').value;
+    const name = document.getElementById('alarmName').value.trim();
+
+    if(!hour || !minute || !ampm) {
+      alert('Please select hour, minute and AM/PM');
+      return;
+    }
+
+    const newAlarm = {
+      hour,
+      minute,
+      ampm,
+      name,
+      active: true,
+      ringing: false
+    };
+
+    // Check for duplicates
+    if(alarms.some(a => a.hour === hour && a.minute === minute && a.ampm === ampm)) {
+      alert('Alarm already set for this time!');
+      return;
+    }
+
+    alarms.push(newAlarm);
+    updateAlarmsList();
+
+    // Reset form
+    hourSelect.value = "";
+    minuteSelect.value = "";
+    document.getElementById('amPm').value = "";
+    document.getElementById('alarmName').value = "";
+  });
+</script>
+</body>
+</html>

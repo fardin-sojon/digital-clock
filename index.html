@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Digital Clock</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(to right, #1f1c2c, #3a6073);
+      --container-bg: rgba(255, 255, 255, 0.05);
+      --clock-color: #3399ff;
+      --text-color: #ffffff;
+      --date-color: #66ccff;
+      --day-bg: rgba(255, 255, 255, 0.1);
+      --today-bg: #3399ff;
+      --today-text: #000;
+    }
+
+    .light-theme {
+      --bg-gradient: linear-gradient(to right, #e0f7fa, #ffffff);
+      --container-bg: rgba(0, 0, 0, 0.05);
+      --clock-color: #007acc;
+      --text-color: #000000;
+      --date-color: #007acc;
+      --day-bg: rgba(0, 0, 0, 0.05);
+      --today-bg: #007acc;
+      --today-text: #fff;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-gradient);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-color);
+      font-family: 'Segoe UI', sans-serif;
+      transition: 0.4s ease;
+    }
+
+    .container {
+      text-align: center;
+      background: var(--container-bg);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+    }
+
+    #clock {
+      font-size: 100px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--clock-color);
+      text-shadow: 0 0 20px rgba(51, 153, 255, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    #ampm {
+      font-size: 24px;
+      text-transform: uppercase;
+      color: #ffcc00;
+      margin-left: 5px;
+    }
+
+    #date {
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: var(--date-color);
+    }
+
+    .weekdays {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .day {
+      font-size: 20px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      background: var(--day-bg);
+      transition: 0.3s;
+    }
+
+    .today {
+      background-color: var(--today-bg);
+      color: var(--today-text);
+      font-weight: bold;
+      box-shadow: 0 0 10px var(--today-bg);
+    }
+
+    .controls {
+      margin-top: 30px;
+    }
+
+    .controls label {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .controls input {
+      padding: 5px 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      margin-right: 15px;
+    }
+
+    .controls input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 5px;
+    }
+
+    #toggleFormat, #toggleTheme {
+      padding: 6px 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    #toggleFormat.on {
+      background-color: #28a745;
+      color: white;
+    }
+
+    #toggleFormat.off {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    #toggleTheme {
+      background-color: #007bff;
+      color: white;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="clock">--:--:-- <span id="ampm"></span></div>
+
+    <div class="nav-links" style="margin-top: 20px;">
+      <a href="asset/alarm.html" style="margin-right: 20px; color: #ffcc00; font-size: 18px;">Alarm</a>
+      <a href="asset/stopwatch.html" style="margin-right: 20px; color: #ffcc00; font-size: 18px;">Stopwatch</a>
+      <a href="asset/timer.html" style="color: #ffcc00; font-size: 18px;">Timer</a>
+    </div>
+
+    <div id="date">Date loading...</div>
+    <div class="weekdays" id="weekdays"></div>
+    <div class="controls">
+      <label>
+        <input type="checkbox" id="autoMode" checked />
+        Auto Date & Time
+      </label><br><br>
+      <label>Set Time: <input type="time" id="manualTime" disabled /></label>
+      <label>Set Date: <input type="date" id="manualDate" disabled /></label>
+      <br><br>
+      <label>12 Hour Format: <button id="toggleFormat" class="on">On</button></label>
+      <br><br>
+      <button id="toggleTheme">Toggle Theme</button>
+    </div>
+  </div>
+
+  <script>
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const clock = document.getElementById("clock");
+    const ampmEl = document.getElementById("ampm");
+    const dateEl = document.getElementById("date");
+    const weekdays = document.getElementById("weekdays");
+    const autoMode = document.getElementById("autoMode");
+    const manualTime = document.getElementById("manualTime");
+    const manualDate = document.getElementById("manualDate");
+    const toggleFormatBtn = document.getElementById("toggleFormat");
+    const toggleTheme = document.getElementById("toggleTheme");
+
+    let is12Hour = true;
+
+    function updateClock() {
+      let now;
+
+      if (autoMode.checked) {
+        const utc = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
+        now = new Date(utc + 6 * 60 * 60 * 1000); // BD Time
+      } else {
+        now = new Date();
+        const datePart = manualDate.value;
+        const timePart = manualTime.value;
+
+        if (datePart) {
+          const [year, month, day] = datePart.split("-");
+          now.setFullYear(parseInt(year));
+          now.setMonth(parseInt(month) - 1);
+          now.setDate(parseInt(day));
+        }
+
+        if (timePart) {
+          const [hour, minute] = timePart.split(":");
+          now.setHours(parseInt(hour));
+          now.setMinutes(parseInt(minute));
+          now.setSeconds(0);
+        }
+      }
+
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      let ampm = "";
+
+      if (is12Hour) {
+        ampm = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+      }
+
+      const displayHours = String(hours).padStart(2, "0");
+      clock.firstChild.textContent = `${displayHours}:${minutes}:${seconds}`;
+      ampmEl.textContent = is12Hour ? ampm : "";
+
+      const dateOptions = { year: "numeric", month: "long", day: "numeric" };
+      dateEl.textContent = `Date: ${now.toLocaleDateString("en-US", dateOptions)}`;
+
+      const currentDay = now.getDay();
+      weekdays.innerHTML = "";
+      dayNames.forEach((day, index) => {
+        const div = document.createElement("div");
+        div.classList.add("day");
+        if (index === currentDay) {
+          div.classList.add("today");
+        }
+        div.textContent = day;
+        weekdays.appendChild(div);
+      });
+    }
+
+    autoMode.addEventListener("change", () => {
+      const isAuto = autoMode.checked;
+      manualTime.disabled = isAuto;
+      manualDate.disabled = isAuto;
+    });
+
+    toggleFormatBtn.addEventListener("click", () => {
+      is12Hour = !is12Hour;
+      toggleFormatBtn.textContent = is12Hour ? "On" : "Off";
+      toggleFormatBtn.classList.toggle("on", is12Hour);
+      toggleFormatBtn.classList.toggle("off", !is12Hour);
+    });
+
+
+    toggleTheme.addEventListener("click", () => {
+  document.body.classList.toggle("light-theme");
+  if (document.body.classList.contains("light-theme")) {
+    toggleTheme.textContent = "Dark Mode";
+  } else {
+    toggleTheme.textContent = "Light Mode";
+  }
+});
+
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>
