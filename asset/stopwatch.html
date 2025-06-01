@@ -1,250 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Stop Watch</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --main-bg: #0a0f2c;
-      --main-text: #00aaff;
-      --alt-bg: #ffffff;
-      --alt-text: #000000;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stop Watch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      :root {
+        --main-bg: #0a0f2c;
+        --main-text: #00aaff;
+        --alt-bg: #ffffff;
+        --alt-text: #000000;
+      }
 
-    body {
-      background-color: var(--main-bg);
-      color: var(--main-text);
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 30px;
-      transition: background-color 0.4s, color 0.4s;
-    }
+      body {
+        background-color: var(--main-bg);
+        color: var(--main-text);
+        font-family: "Segoe UI", sans-serif;
+        text-align: center;
+        padding: 30px;
+        transition: background-color 0.4s, color 0.4s;
+      }
 
-    h1 {
-      margin-bottom: 20px;
-      text-shadow: 0 0 8px var(--main-text);
-    }
+      h1 {
+        margin-bottom: 20px;
+        text-shadow: 0 0 8px var(--main-text);
+      }
 
-    #display {
-      font-size: 3rem;
-      padding: 15px;
-      margin: 20px auto;
-      width: 220px;
-      background: #10153d;
-      border: 2px solid var(--main-text);
-      border-radius: 10px;
-      box-shadow: 0 0 10px var(--main-text);
-      transition: background-color 0.4s, border-color 0.4s, box-shadow 0.4s;
-    }
+      #display {
+        font-size: 3rem;
+        padding: 15px;
+        margin: 20px auto;
+        width: 220px;
+        background: #10153d;
+        border: 2px solid var(--main-text);
+        border-radius: 10px;
+        box-shadow: 0 0 10px var(--main-text);
+        transition: background-color 0.4s, border-color 0.4s, box-shadow 0.4s;
+      }
 
-    .buttons, .speed-control, .lap-control {
-      margin: 10px auto;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+      .buttons,
+      .speed-control,
+      .lap-control {
+        margin: 10px auto;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
 
-    button, select {
-      background: var(--main-text);
-      color: var(--alt-text);
-      border: none;
-      padding: 12px 18px;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s, color 0.3s;
-    }
+      button,
+      select {
+        background: var(--main-text);
+        color: var(--alt-text);
+        border: none;
+        padding: 12px 18px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+      }
 
-    button:hover, select:hover {
-      background-color: #0095dd;
-    }
+      button:hover,
+      select:hover {
+        background-color: #0095dd;
+      }
 
-    .lap-list {
-      margin-top: 15px;
-      max-height: 200px;
-      overflow-y: auto;
-      padding: 10px;
-      border: 1px solid var(--main-text);
-      border-radius: 8px;
-      background-color: #10153d;
-      transition: background-color 0.4s, border-color 0.4s;
-    }
+      .lap-list {
+        margin-top: 15px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid var(--main-text);
+        border-radius: 8px;
+        background-color: #10153d;
+        transition: background-color 0.4s, border-color 0.4s;
+      }
 
-    .lap-item {
-      margin: 5px 0;
-      border-bottom: 1px dashed var(--main-text);
-      padding-bottom: 4px;
-    }
+      .lap-item {
+        margin: 5px 0;
+        border-bottom: 1px dashed var(--main-text);
+        padding-bottom: 4px;
+      }
 
-    .status, .mode-toggle {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #bbbbbb;
-    }
+      .status,
+      .mode-toggle {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #bbbbbb;
+      }
 
-    /* Light Mode Styles */
-    body.light-mode {
-      background-color: var(--alt-bg);
-      color: var(--alt-text);
-    }
+      /* Light Mode Styles */
+      body.light-mode {
+        background-color: var(--alt-bg);
+        color: var(--alt-text);
+      }
 
-    body.light-mode #display {
-      background: #e0e0e0;
-      border-color: var(--alt-text);
-      box-shadow: 0 0 10px var(--alt-text);
-      color: var(--alt-text);
-    }
+      body.light-mode #display {
+        background: #e0e0e0;
+        border-color: var(--alt-text);
+        box-shadow: 0 0 10px var(--alt-text);
+        color: var(--alt-text);
+      }
 
-    body.light-mode .lap-list {
-      background-color: #f5f5f5;
-      border-color: var(--alt-text);
-      color: var(--alt-text);
-    }
+      body.light-mode .lap-list {
+        background-color: #f5f5f5;
+        border-color: var(--alt-text);
+        color: var(--alt-text);
+      }
 
-    body.light-mode button, 
-    body.light-mode select {
-      background: var(--alt-text);
-      color: var(--alt-bg);
-    }
+      body.light-mode button,
+      body.light-mode select {
+        background: var(--alt-text);
+        color: var(--alt-bg);
+      }
 
-    body.light-mode button:hover,
-    body.light-mode select:hover {
-      background-color: #555555;
-    }
-  </style>
-</head>
-<body>
+      body.light-mode button:hover,
+      body.light-mode select:hover {
+        background-color: #555555;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Stop Watch</h1>
+    <div id="display">00:00:00</div>
 
-  <h1>Stop Watch</h1>
-  <div id="display">00:00:00</div>
+    <div class="buttons">
+      <button onclick="start()">Start</button>
+      <button onclick="pause()">Pause</button>
+      <button onclick="reset()">Reset</button>
+      <button onclick="lap()">Lap</button>
+    </div>
 
-  <div class="buttons">
-    <button onclick="start()">Start</button>
-    <button onclick="pause()">Pause</button>
-    <button onclick="reset()">Reset</button>
-    <button onclick="lap()">Lap</button>
-  </div>
+    <div class="speed-control">
+      <label for="speed">Speed:</label>
+      <select id="speed" onchange="changeSpeed()">
+        <option value="1">1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+    </div>
 
-  <div class="speed-control">
-    <label for="speed">Speed:</label>
-    <select id="speed" onchange="changeSpeed()">
-      <option value="1">1x</option>
-      <option value="1.5">1.5x</option>
-      <option value="2">2x</option>
-    </select>
-  </div>
+    <div class="lap-control">
+      <button onclick="clearLaps()">Clear Laps</button>
+      <button id="modeToggleBtn" onclick="toggleMode()">
+        Switch to Light Mode
+      </button>
+    </div>
 
-  <div class="lap-control">
-    <button onclick="clearLaps()">Clear Laps</button>
-    <button id="modeToggleBtn" onclick="toggleMode()">Switch to Light Mode</button>
-  </div>
+    <div class="status" id="statusText">Status: Stopped</div>
 
-  <div class="status" id="statusText">Status: Stopped</div>
+    <div class="lap-list" id="lapList"></div>
 
-  <div class="lap-list" id="lapList"></div>
+    <script>
+      let [seconds, minutes, hours] = [0, 0, 0];
+      let display = document.getElementById("display");
+      let interval = null;
+      let speed = 1000;
+      let statusText = document.getElementById("statusText");
+      let lapList = document.getElementById("lapList");
+      const modeToggleBtn = document.getElementById("modeToggleBtn");
+      const body = document.body;
 
-  <script>
-    let [seconds, minutes, hours] = [0, 0, 0];
-    let display = document.getElementById('display');
-    let interval = null;
-    let speed = 1000;
-    let statusText = document.getElementById("statusText");
-    let lapList = document.getElementById("lapList");
-    const modeToggleBtn = document.getElementById('modeToggleBtn');
-    const body = document.body;
+      function updateDisplay() {
+        display.innerText =
+          (hours < 10 ? "0" + hours : hours) +
+          ":" +
+          (minutes < 10 ? "0" + minutes : minutes) +
+          ":" +
+          (seconds < 10 ? "0" + seconds : seconds);
+      }
 
-    function updateDisplay() {
-      display.innerText =
-        (hours < 10 ? "0" + hours : hours) + ":" +
-        (minutes < 10 ? "0" + minutes : minutes) + ":" +
-        (seconds < 10 ? "0" + seconds : seconds);
-    }
+      function stopwatch() {
+        seconds++;
+        if (seconds === 60) {
+          seconds = 0;
+          minutes++;
+          if (minutes === 60) {
+            minutes = 0;
+            hours++;
+          }
+        }
+        updateDisplay();
+      }
 
-    function stopwatch() {
-      seconds++;
-      if (seconds === 60) {
-        seconds = 0;
-        minutes++;
-        if (minutes === 60) {
-          minutes = 0;
-          hours++;
+      function start() {
+        if (interval !== null) return;
+        interval = setInterval(stopwatch, speed);
+        statusText.innerText = "Status: Running...";
+      }
+
+      function pause() {
+        clearInterval(interval);
+        interval = null;
+        statusText.innerText = "Status: Paused";
+      }
+
+      function reset() {
+        pause();
+        [seconds, minutes, hours] = [0, 0, 0];
+        updateDisplay();
+        statusText.innerText = "Status: Reset";
+      }
+
+      function lap() {
+        let time = display.innerText;
+        const lapItem = document.createElement("div");
+        lapItem.className = "lap-item";
+        lapItem.innerText = `Lap ${lapList.children.length + 1}: ${time}`;
+        lapList.appendChild(lapItem);
+        saveLaps();
+      }
+
+      function clearLaps() {
+        lapList.innerHTML = "";
+        localStorage.removeItem("laps");
+      }
+
+      function changeSpeed() {
+        const selected = parseFloat(document.getElementById("speed").value);
+        speed = 1000 / selected;
+
+        if (interval !== null) {
+          clearInterval(interval);
+          interval = setInterval(stopwatch, speed);
         }
       }
-      updateDisplay();
-    }
 
-    function start() {
-      if (interval !== null) return;
-      interval = setInterval(stopwatch, speed);
-      statusText.innerText = "Status: Running...";
-    }
-
-    function pause() {
-      clearInterval(interval);
-      interval = null;
-      statusText.innerText = "Status: Paused";
-    }
-
-    function reset() {
-      pause();
-      [seconds, minutes, hours] = [0, 0, 0];
-      updateDisplay();
-      statusText.innerText = "Status: Reset";
-    }
-
-    function lap() {
-      let time = display.innerText;
-      const lapItem = document.createElement("div");
-      lapItem.className = "lap-item";
-      lapItem.innerText = `Lap ${lapList.children.length + 1}: ${time}`;
-      lapList.appendChild(lapItem);
-      saveLaps();
-    }
-
-    function clearLaps() {
-      lapList.innerHTML = '';
-      localStorage.removeItem("laps");
-    }
-
-    function changeSpeed() {
-      const selected = parseFloat(document.getElementById('speed').value);
-      speed = 1000 / selected;
-
-      if (interval !== null) {
-        clearInterval(interval);
-        interval = setInterval(stopwatch, speed);
+      function toggleMode() {
+        if (body.classList.contains("light-mode")) {
+          body.classList.remove("light-mode");
+          modeToggleBtn.textContent = "Light Mode";
+        } else {
+          body.classList.add("light-mode");
+          modeToggleBtn.textContent = "Dark Mode";
+        }
       }
-    }
 
-    function toggleMode() {
-      if(body.classList.contains('light-mode')){
-        body.classList.remove('light-mode');
-        modeToggleBtn.textContent = 'Light Mode';
-      } else {
-        body.classList.add('light-mode');
-        modeToggleBtn.textContent = 'Dark Mode';
+      function saveLaps() {
+        localStorage.setItem("laps", lapList.innerHTML);
       }
-    }
 
-    function saveLaps() {
-      localStorage.setItem("laps", lapList.innerHTML);
-    }
-
-    function loadLaps() {
-      lapList.innerHTML = localStorage.getItem("laps") || "";
-    }
-
-    window.onload = () => {
-      loadLaps();
-      if(body.classList.contains('light-mode')){
-        modeToggleBtn.textContent = 'Dark Mode';
-      } else {
-        modeToggleBtn.textContent = 'Light Mode';
+      function loadLaps() {
+        lapList.innerHTML = localStorage.getItem("laps") || "";
       }
-    };
-  </script>
 
-</body>
+      window.onload = () => {
+        loadLaps();
+        if (body.classList.contains("light-mode")) {
+          modeToggleBtn.textContent = "Dark Mode";
+        } else {
+          modeToggleBtn.textContent = "Light Mode";
+        }
+      };
+    </script>
+  </body>
 </html>
